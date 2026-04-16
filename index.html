@@ -1078,16 +1078,30 @@
       specData.push(line);
       
       // Draw
-      specCtx.fillStyle = '#0a0a0a';
+      specCtx.fillStyle = '#000000';
       specCtx.fillRect(0, 0, w, h);
       
-      specData.forEach((l, i) => {
-        l.forEach((v, x) => {
-          const intensity = Math.floor(v * 255);
-          specCtx.fillStyle = `rgb(${intensity},${intensity},${intensity})`;
-          specCtx.fillRect(x, h - specData.length + i, 1, 1);
-        });
-      });
+      // Draw specData - waterfall from top (newest) to bottom (oldest)
+      // specData is array of lines, each line has w values (one per x pixel)
+      // Draw most recent lines (last ~60) stacked vertically
+      const maxLines = Math.min(specData.length, 60);
+      const lineHeight = h / maxLines;
+      for (let lineIdx = 0; lineIdx < maxLines; lineIdx++) {
+        const line = specData[specData.length - 1 - lineIdx];
+        const y = lineIdx * lineHeight;
+        for (let x = 0; x < Math.min(w, line.length); x++) {
+          const v = line[x];
+          // Scale up so noise is visible
+          const intensity = Math.min(255, Math.floor(v * 500));
+          if (intensity > 8) {
+            specCtx.fillStyle = `rgb(${intensity},${intensity},${intensity})`;
+            specCtx.fillRect(x, y, 1, lineHeight + 1);
+          }
+        }
+      }
+      // Green scan line on left edge
+      specCtx.fillStyle = 'rgba(0, 255, 100, 0.9)';
+      specCtx.fillRect(0, 0, 2, h);
       
       requestAnimationFrame(drawSpectrogram);
     }
