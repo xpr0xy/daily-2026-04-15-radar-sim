@@ -5,6 +5,26 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>CMX-7500 GEN 2A RADCOMMS IMGU</title>
   <style>
+    /* Design tokens */
+    :root {
+      --fg: #ffffff;
+      --dim: #888888;
+      --glow: rgba(255, 255, 255, 0.15);
+      --bg: #0a0a0a;
+      --space-xs: 0.25rem;
+      --space-sm: 0.5rem;
+      --space-md: 1rem;
+      --space-lg: 2rem;
+      --text-xs: clamp(9px, 1.5vw, 11px);
+      --text-sm: clamp(10px, 1.8vw, 12px);
+      --text-base: clamp(11px, 2vw, 14px);
+      --text-lg: clamp(14px, 2.5vw, 18px);
+      --text-xl: clamp(18px, 3vw, 24px);
+      --bp-sm: 640px;
+      --bp-md: 768px;
+      --bp-lg: 1024px;
+    }
+    
     @font-face {
       font-family: 'HoustonMono';
       src: local('Courier New'), local('Consolas'), local('Monaco');
@@ -16,18 +36,19 @@
       box-sizing: border-box;
     }
     
-    :root {
-      --fg: #ffffff;
-      --dim: #888888;
-      --glow: rgba(255, 255, 255, 0.15);
-      --bg: #0a0a0a;
+    /* Reduced motion */
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        transition-duration: 0.01ms !important;
+      }
     }
     
     body {
       background: var(--bg);
       color: var(--fg);
       font-family: 'HoustonMono', 'Courier New', monospace;
-      font-size: 11px;
+      font-size: var(--text-base);
       line-height: 1.4;
       min-height: 100vh;
       overflow-x: hidden;
@@ -61,45 +82,51 @@
     .container {
       max-width: 1400px;
       margin: 0 auto;
-      padding: 8px;
+      padding: var(--space-sm);
     }
     
-    /* Header */
+    /* Header - mobile stack, desktop row */
     .header {
       display: flex;
+      flex-wrap: wrap;
+      gap: var(--space-sm);
       justify-content: space-between;
       align-items: flex-start;
       border-bottom: 1px solid var(--fg);
-      padding-bottom: 8px;
-      margin-bottom: 8px;
+      padding-bottom: var(--space-sm);
+      margin-bottom: var(--space-sm);
     }
     
     .header-left {
       display: flex;
       flex-direction: column;
       gap: 2px;
+      flex: 1;
+      min-width: 200px;
     }
     
     .header-left h1 {
-      font-size: 14px;
+      font-size: var(--text-lg);
       font-weight: normal;
       letter-spacing: 2px;
     }
     
     .govt-prop {
-      font-size: 9px;
+      font-size: var(--text-xs);
       color: var(--dim);
     }
     
     .logo-box {
-      width: 60px;
-      height: 40px;
+      width: clamp(50px, 8vw, 60px);
+      height: clamp(32px, 6vw, 40px);
       border: 1px solid var(--fg);
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 18px;
+      font-size: var(--text-xl);
       font-weight: bold;
+      min-width: 44px;
+      min-height: 44px;
     }
     
     .header-right {
@@ -108,24 +135,34 @@
     
     .tx-rx {
       display: flex;
-      gap: 20px;
-      font-size: 10px;
+      gap: var(--space-md);
+      font-size: var(--text-sm);
     }
     
-    .tx-rx span {
-      display: block;
+    .tx-rx > div {
+      min-width: 44px;
+      min-height: 44px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
     }
     
-    /* Main Grid */
+    /* Main Grid - single column mobile, 3-col desktop */
     .main-grid {
       display: grid;
-      grid-template-columns: 1fr 1fr 1fr;
-      gap: 8px;
+      grid-template-columns: 1fr;
+      gap: var(--space-sm);
+    }
+    
+    @media (min-width: 768px) {
+      .main-grid {
+        grid-template-columns: 1fr 1fr 1fr;
+      }
     }
     
     .panel {
       border: 1px solid var(--fg);
-      padding: 8px;
+      padding: var(--space-sm);
       position: relative;
     }
     
@@ -135,18 +172,42 @@
       left: 12px;
       background: var(--bg);
       padding: 0 6px;
-      font-size: 9px;
+      font-size: var(--text-xs);
       color: var(--dim);
+    }
+    
+    /* Columns for tablet+ */
+    .left-col, .middle-col, .right-col {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-sm);
+    }
+    
+    @media (min-width: 768px) {
+      .left-col { grid-column: 1; }
+      .middle-col { grid-column: 2; }
+      .right-col { grid-column: 3; }
+    }
+    
+    .full-width {
+      grid-column: 1;
+    }
+    
+    @media (min-width: 768px) {
+      .full-width {
+        grid-column: 1 / -1;
+      }
     }
     
     /* Boot Log */
     .boot-log {
-      font-size: 10px;
+      font-size: var(--text-sm);
     }
     
-    .boot-log div {
+    .boot-log > div {
       display: flex;
       justify-content: space-between;
+      padding: 2px 0;
     }
     
     .boot-log .pass {
@@ -163,7 +224,7 @@
     
     /* Channel Map */
     .channel-map {
-      font-size: 10px;
+      font-size: var(--text-sm);
     }
     
     .channel-row {
@@ -179,16 +240,16 @@
     
     /* RTC Display */
     .rtc {
-      font-size: 24px;
+      font-size: var(--text-xl);
       text-align: center;
       letter-spacing: 3px;
-      padding: 10px;
+      padding: var(--space-sm);
       border: 1px solid var(--fg);
-      margin-bottom: 8px;
+      margin-bottom: var(--space-sm);
     }
     
     .rtc-label {
-      font-size: 9px;
+      font-size: var(--text-xs);
       color: var(--dim);
       text-align: center;
       margin-bottom: 4px;
@@ -196,8 +257,8 @@
     
     /* Serial/Modem */
     .serial-status {
-      font-size: 10px;
-      margin-bottom: 8px;
+      font-size: var(--text-sm);
+      margin-bottom: var(--space-sm);
     }
     
     .serial-row {
@@ -209,14 +270,22 @@
     /* Gyro */
     .gyro-display {
       display: flex;
-      gap: 15px;
-      font-size: 10px;
-      margin-bottom: 8px;
+      flex-wrap: wrap;
+      gap: var(--space-sm);
+      font-size: var(--text-sm);
+      margin-bottom: var(--space-sm);
+    }
+    
+    .gyro-display > div {
+      min-width: 80px;
+      min-height: 44px;
+      display: flex;
+      align-items: center;
     }
     
     /* Tramsys */
     .tramsys {
-      font-size: 10px;
+      font-size: var(--text-sm);
     }
     
     .tramsys-row {
@@ -229,12 +298,13 @@
     /* Weapons Bar */
     .weapons-bar {
       display: flex;
+      flex-wrap: wrap;
       align-items: center;
       justify-content: center;
-      gap: 8px;
-      padding: 6px;
+      gap: var(--space-sm);
+      padding: var(--space-sm);
       border: 1px solid var(--fg);
-      margin-top: 8px;
+      margin-top: var(--space-sm);
     }
     
     .checkered {
@@ -250,23 +320,23 @@
     }
     
     .armed-text {
-      font-size: 14px;
+      font-size: var(--text-lg);
       letter-spacing: 4px;
     }
     
-    /* Radar */
+    /* Radar - centered on mobile */
     .radar-container {
       position: relative;
-      width: 100%;
-      aspect-ratio: 1;
-      max-width: 280px;
+      width: min(100%, 280px);
+      margin: 0 auto;
     }
     
     #radar {
       width: 100%;
-      height: 100%;
+      aspect-ratio: 1;
       border-radius: 50%;
       border: 1px solid var(--fg);
+      display: block;
     }
     
     .radar-overlay {
@@ -275,15 +345,15 @@
       left: 50%;
       transform: translate(-50%, -50%);
       text-align: center;
-      font-size: 9px;
+      font-size: var(--text-xs);
       color: var(--dim);
       pointer-events: none;
     }
     
     /* Target List */
     .target-list {
-      font-size: 10px;
-      margin-top: 8px;
+      font-size: var(--text-sm);
+      margin-top: var(--space-sm);
     }
     
     .target-row {
@@ -296,30 +366,37 @@
     .elec-schematic {
       display: flex;
       flex-direction: column;
-      gap: 8px;
+      gap: var(--space-sm);
     }
     
     .bus-row {
       display: flex;
+      flex-wrap: wrap;
       align-items: center;
-      gap: 8px;
-      font-size: 10px;
+      gap: var(--space-xs);
+      font-size: var(--text-sm);
     }
     
     .gen-box {
       border: 1px solid var(--fg);
-      padding: 4px 8px;
-      font-size: 9px;
+      padding: var(--space-xs) var(--space-sm);
+      font-size: var(--text-xs);
+      min-width: 44px;
+      min-height: 44px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
     }
     
     .voltage {
-      font-size: 14px;
+      font-size: var(--text-base);
     }
     
     /* Spectrogram */
     .spectrogram-container {
       border: 1px solid var(--fg);
-      height: 120px;
+      height: min(120px, 20vw);
       position: relative;
       overflow: hidden;
     }
@@ -327,34 +404,37 @@
     #spectrogram {
       width: 100%;
       height: 100%;
+      display: block;
     }
     
     .spec-params {
       display: flex;
-      gap: 15px;
-      font-size: 9px;
-      margin-top: 4px;
+      flex-wrap: wrap;
+      gap: var(--space-sm);
+      font-size: var(--text-xs);
+      margin-top: var(--space-xs);
       color: var(--dim);
     }
     
     /* RWR Contact Log */
     .rwr-table {
-      font-size: 10px;
+      font-size: var(--text-sm);
       width: 100%;
     }
     
     .rwr-row {
       display: flex;
+      flex-wrap: wrap;
       padding: 3px 0;
       border-bottom: 1px solid rgba(255,255,255,0.1);
+      gap: var(--space-sm);
     }
     
-    .rwr-row div:first-child {
-      width: 30px;
-    }
-    
-    .rwr-row div:nth-child(2) {
-      width: 40px;
+    .rwr-row > div {
+      min-width: 44px;
+      min-height: 44px;
+      display: flex;
+      align-items: center;
     }
     
     .priority {
@@ -365,39 +445,54 @@
     /* Countermeasures */
     .chaff-flare {
       display: flex;
-      gap: 15px;
-      font-size: 10px;
+      flex-wrap: wrap;
+      gap: var(--space-sm);
+      font-size: var(--text-sm);
+    }
+    
+    .chaff-flare > div {
+      min-height: 44px;
+      display: flex;
+      align-items: center;
     }
     
     /* Hydraulics */
     .hydraulic-schematic {
       display: flex;
-      align-items: center;
-      gap: 10px;
-      font-size: 10px;
+      flex-wrap: wrap;
+      gap: var(--space-sm);
+      font-size: var(--text-sm);
     }
     
     .pump-box {
       border: 1px solid var(--fg);
-      padding: 4px 8px;
+      padding: var(--space-xs) var(--space-sm);
       text-align: center;
+      min-width: 60px;
+      min-height: 44px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
     }
     
     .pump-flow {
-      font-size: 14px;
+      font-size: var(--text-base);
       display: block;
     }
     
     /* Reservoir Bars */
     .reservoir-bars {
       display: flex;
-      gap: 15px;
+      flex-wrap: wrap;
+      gap: var(--space-md);
       align-items: flex-end;
-      height: 60px;
+      min-height: 80px;
+      padding-top: 20px;
     }
     
     .res-bar {
-      width: 30px;
+      width: clamp(40px, 10vw, 60px);
+      height: 60px;
       border: 1px solid var(--fg);
       position: relative;
       background: linear-gradient(to top, var(--fg) var(--pct), transparent var(--pct));
@@ -405,31 +500,36 @@
     
     .res-label {
       position: absolute;
-      bottom: -15px;
+      bottom: -18px;
       left: 50%;
       transform: translateX(-50%);
-      font-size: 9px;
+      font-size: var(--text-xs);
+      white-space: nowrap;
     }
     
     .res-pct {
       position: absolute;
-      top: -15px;
+      top: -16px;
       left: 50%;
       transform: translateX(-50%);
-      font-size: 9px;
+      font-size: var(--text-xs);
     }
     
     /* Flight Status */
     .flight-status {
       display: flex;
-      gap: 15px;
-      font-size: 10px;
       flex-wrap: wrap;
+      gap: var(--space-xs);
+      font-size: var(--text-sm);
     }
     
     .status-item {
-      padding: 4px 8px;
+      padding: var(--space-xs) var(--space-sm);
       border: 1px solid var(--fg);
+      min-height: 44px;
+      min-width: 44px;
+      display: flex;
+      align-items: center;
     }
     
     .status-item.active {
@@ -439,8 +539,8 @@
     
     /* Environmental */
     .env-readings {
-      font-size: 10px;
-      margin-top: 8px;
+      font-size: var(--text-sm);
+      margin-top: var(--space-sm);
     }
     
     .env-row {
@@ -448,37 +548,36 @@
       justify-content: space-between;
     }
     
-    /* Footer */
+    /* Footer - horizontal on all screens */
     .footer {
-      margin-top: 8px;
+      margin-top: var(--space-sm);
       border-top: 1px solid var(--fg);
-      padding-top: 8px;
+      padding-top: var(--space-sm);
       display: flex;
+      flex-wrap: wrap;
       justify-content: flex-end;
-      gap: 20px;
-      font-size: 9px;
+      gap: var(--space-md);
+      font-size: var(--text-xs);
       color: var(--dim);
-      writing-mode: vertical-rl;
-      text-orientation: mixed;
-      max-height: 200px;
-      overflow: hidden;
     }
     
-    /* Two column layout for left/middle panels */
-    .left-col, .middle-col, .right-col {
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
+    /* Bottom systems grid */
+    .bottom-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: var(--space-sm);
     }
     
-    .full-width {
-      grid-column: 1 / -1;
+    @media (min-width: 640px) {
+      .bottom-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
     }
     
-    /* Scanline animation for radar */
-    @keyframes sweep {
-      from { transform: rotate(0deg); }
-      to { transform: rotate(360deg); }
+    @media (min-width: 1024px) {
+      .bottom-grid {
+        grid-template-columns: repeat(4, 1fr);
+      }
     }
   </style>
 </head>
@@ -663,7 +762,7 @@
       </div>
       
       <!-- Full Width: Bottom Systems -->
-      <div class="panel full-width" style="display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 15px;">
+      <div class="panel full-width bottom-grid">
         <!-- Countermeasures -->
         <div>
           <div class="panel-title">COUNTERMEASURES</div>
