@@ -222,6 +222,75 @@
       50% { opacity: 0; }
     }
     
+    /* Status LED */
+    .led {
+      display: inline-block;
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      margin-right: 4px;
+    }
+    
+    .led-green {
+      background: #00ff00;
+      box-shadow: 0 0 4px #00ff00;
+      animation: pulse-green 1.5s ease-in-out infinite;
+    }
+    
+    .led-red {
+      background: #ff0000;
+      box-shadow: 0 0 4px #ff0000;
+      animation: pulse-red 0.8s ease-in-out infinite;
+    }
+    
+    .led-amber {
+      background: #ffaa00;
+      box-shadow: 0 0 4px #ffaa00;
+      animation: pulse-amber 2s ease-in-out infinite;
+    }
+    
+    @keyframes pulse-green {
+      0%, 100% { opacity: 1; box-shadow: 0 0 4px #00ff00; }
+      50% { opacity: 0.4; box-shadow: 0 0 2px #00ff00; }
+    }
+    
+    @keyframes pulse-red {
+      0%, 100% { opacity: 1; box-shadow: 0 0 4px #ff0000; }
+      50% { opacity: 0.3; box-shadow: 0 0 8px #ff0000; }
+    }
+    
+    @keyframes pulse-amber {
+      0%, 100% { opacity: 0.8; box-shadow: 0 0 4px #ffaa00; }
+      50% { opacity: 0.3; box-shadow: 0 0 2px #ffaa00; }
+    }
+    
+    /* Live cursor */
+    .cursor {
+      display: inline-block;
+      width: 8px;
+      height: 14px;
+      background: var(--fg);
+      animation: cursor-blink 1s step-end infinite;
+      vertical-align: middle;
+      margin-left: 2px;
+    }
+    
+    @keyframes cursor-blink {
+      0%, 50% { opacity: 1; }
+      51%, 100% { opacity: 0; }
+    }
+    
+    /* Scanline flicker */
+    .flicker {
+      animation: flicker 0.1s infinite;
+    }
+    
+    @keyframes flicker {
+      0% { opacity: 1; }
+      50% { opacity: 0.97; }
+      100% { opacity: 1; }
+    }
+    
     /* Channel Map */
     .channel-map {
       font-size: var(--text-sm);
@@ -305,6 +374,12 @@
       padding: var(--space-sm);
       border: 1px solid var(--fg);
       margin-top: var(--space-sm);
+      animation: weapons-pulse 2s ease-in-out infinite;
+    }
+    
+    @keyframes weapons-pulse {
+      0%, 100% { box-shadow: 0 0 5px rgba(255,255,255,0.2); }
+      50% { box-shadow: 0 0 15px rgba(255,255,255,0.4); }
     }
     
     .checkered {
@@ -595,6 +670,10 @@
           <div>TX<br><span id="tx-val">008/064</span></div>
           <div>RX<br><span id="rx-val">012/128</span></div>
         </div>
+        <div style="margin-top: 4px; display: flex; align-items: center; gap: 6px;">
+          <span class="led led-green"></span>
+          <span style="font-size: var(--text-xs);">SYS ACTIVE</span>
+        </div>
       </div>
     </div>
     
@@ -604,7 +683,7 @@
       <div class="left-col">
         <!-- Boot Log -->
         <div class="panel">
-          <div class="panel-title">SYSTEM BOOT V2.14A</div>
+          <div class="panel-title"><span class="led led-green"></span>SYS BOOT V2.14A</div>
           <div class="boot-log" id="boot-log">
             <div><span>MEMORY TEST 64KB</span><span class="pass">PASS</span></div>
             <div><span>MPS STANDBY</span><span class="pass">PASS</span></div>
@@ -615,7 +694,7 @@
         
         <!-- Channel Map -->
         <div class="panel">
-          <div class="panel-title">CH MAP: AGS-100 MODULE</div>
+          <div class="panel-title"><span class="led led-green"></span>CH MAP: AGS-100</div>
           <div class="channel-map" id="channel-map">
             <div class="channel-row"><span>CCD-W</span><span class="channel-indicator">●</span></div>
             <div class="channel-row"><span>CCD-N</span><span class="channel-indicator">●</span></div>
@@ -628,12 +707,12 @@
         <!-- RTC -->
         <div>
           <div class="rtc-label">RTC / ZULU</div>
-          <div class="rtc" id="rtc">--:--:--</div>
+          <div class="rtc" id="rtc">--:--:--<span class="cursor"></span></div>
         </div>
         
         <!-- Serial/Modem -->
         <div class="panel">
-          <div class="panel-title">SERIAL / MODEM</div>
+          <div class="panel-title"><span class="led led-green"></span>SERIAL / MODEM</div>
           <div class="serial-status">
             <div class="serial-row"><span>SERIAL A: 9600 QN1</span><span>LINK</span></div>
             <div class="serial-row"><span>SERIAL B: 1200 QN2</span><span>OFFLINE</span></div>
@@ -644,7 +723,7 @@
         
         <!-- Gyro -->
         <div class="panel">
-          <div class="panel-title">GYRO / ALIGNMENT</div>
+          <div class="panel-title"><span class="led led-amber"></span>GYRO / ALIGN</div>
           <div class="gyro-display">
             <div>GYRO X: <span id="gyro-x">ALIGN</span></div>
             <div>GYRO Y: <span id="gyro-y">ALIGN</span></div>
@@ -666,7 +745,7 @@
       <div class="middle-col">
         <!-- Tramsys -->
         <div class="panel">
-          <div class="panel-title">TRAMSYS</div>
+          <div class="panel-title"><span class="led led-green"></span>TRAMSYS</div>
           <div class="tramsys">
             <div class="tramsys-row"><span>185 NM TACAN</span><span id="tacan">22.1 SRCH</span></div>
             <div class="tramsys-row"><span>UHF 243.0</span><span id="uhf">GRD ACTIVE</span></div>
@@ -676,7 +755,7 @@
         
         <!-- Radar -->
         <div class="panel">
-          <div class="panel-title">RADAR / TRACKING</div>
+          <div class="panel-title"><span class="led led-amber"></span>RADAR / TRACK</div>
           <div class="radar-container">
             <canvas id="radar"></canvas>
             <div class="radar-overlay">RADAR SCOPE</div>
@@ -694,7 +773,7 @@
       <div class="right-col">
         <!-- Electrical -->
         <div class="panel">
-          <div class="panel-title">ELEC SUBSYS COLLINS 82</div>
+          <div class="panel-title"><span class="led led-green"></span>ELEC SUBSYS</div>
           <div class="elec-schematic">
             <div class="bus-row">
               <div class="gen-box">
@@ -720,7 +799,7 @@
         
         <!-- Spectrogram -->
         <div class="panel">
-          <div class="panel-title">SIGNAL / SPECTROGRAM</div>
+          <div class="panel-title"><span class="led led-amber"></span>SIG / SPECTRO</div>
           <div class="spectrogram-container">
             <canvas id="spectrogram"></canvas>
           </div>
@@ -735,7 +814,7 @@
       
       <!-- Full Width: RWR Contact Log -->
       <div class="panel full-width">
-        <div class="panel-title">RWR CONTACT LOG / PRIORITY THREAD</div>
+        <div class="panel-title"><span class="led led-red blink"></span>RWR / THREAT</div>
         <div class="rwr-table">
           <div class="rwr-row">
             <div class="priority">C4</div>
@@ -765,7 +844,7 @@
       <div class="panel full-width bottom-grid">
         <!-- Countermeasures -->
         <div>
-          <div class="panel-title">COUNTERMEASURES</div>
+          <div class="panel-title"><span class="led led-green"></span>COUNTERMEAS</div>
           <div class="chaff-flare">
             <div>CHAFF REM: <span id="chaff">48</span></div>
             <div>FLARE REM: <span id="flare">32</span></div>
@@ -775,7 +854,7 @@
         
         <!-- Hydraulics -->
         <div>
-          <div class="panel-title">HYDRAULICS</div>
+          <div class="panel-title"><span class="led led-green"></span>HYDRAULICS</div>
           <div class="hydraulic-schematic">
             <div class="pump-box">
               <span class="pump-flow" id="pump1">142</span>
@@ -794,7 +873,7 @@
         
         <!-- Reservoirs -->
         <div>
-          <div class="panel-title">RESERVOIR LEVELS</div>
+          <div class="panel-title"><span class="led led-amber"></span>RESERVOIRS</div>
           <div class="reservoir-bars">
             <div class="res-bar" style="--pct: 92%">
               <span class="res-pct">92%</span>
@@ -813,7 +892,7 @@
         
         <!-- Flight Status -->
         <div>
-          <div class="panel-title">FLIGHT STATUS</div>
+          <div class="panel-title"><span class="led led-green"></span>FLIGHT STAT</div>
           <div class="flight-status">
             <div class="status-item active">[FLT-CTL] ACTIVE</div>
             <div class="status-item">[GEAR] DOWN</div>
