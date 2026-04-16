@@ -1,0 +1,951 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CMX-7500 GEN 2A RADCOMMS IMGU</title>
+  <style>
+    @font-face {
+      font-family: 'HoustonMono';
+      src: local('Courier New'), local('Consolas'), local('Monaco');
+    }
+    
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    :root {
+      --fg: #ffffff;
+      --dim: #888888;
+      --glow: rgba(255, 255, 255, 0.15);
+      --bg: #0a0a0a;
+    }
+    
+    body {
+      background: var(--bg);
+      color: var(--fg);
+      font-family: 'HoustonMono', 'Courier New', monospace;
+      font-size: 11px;
+      line-height: 1.4;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+    
+    /* CRT effect */
+    body::before {
+      content: '';
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: repeating-linear-gradient(
+        0deg,
+        rgba(0, 0, 0, 0.15) 0px,
+        rgba(0, 0, 0, 0.15) 1px,
+        transparent 1px,
+        transparent 2px
+      );
+      pointer-events: none;
+      z-index: 9999;
+    }
+    
+    body::after {
+      content: '';
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: radial-gradient(ellipse at center, transparent 0%, rgba(0,0,0,0.4) 100%);
+      pointer-events: none;
+      z-index: 9998;
+    }
+    
+    .container {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 8px;
+    }
+    
+    /* Header */
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      border-bottom: 1px solid var(--fg);
+      padding-bottom: 8px;
+      margin-bottom: 8px;
+    }
+    
+    .header-left {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+    
+    .header-left h1 {
+      font-size: 14px;
+      font-weight: normal;
+      letter-spacing: 2px;
+    }
+    
+    .govt-prop {
+      font-size: 9px;
+      color: var(--dim);
+    }
+    
+    .logo-box {
+      width: 60px;
+      height: 40px;
+      border: 1px solid var(--fg);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      font-weight: bold;
+    }
+    
+    .header-right {
+      text-align: right;
+    }
+    
+    .tx-rx {
+      display: flex;
+      gap: 20px;
+      font-size: 10px;
+    }
+    
+    .tx-rx span {
+      display: block;
+    }
+    
+    /* Main Grid */
+    .main-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 8px;
+    }
+    
+    .panel {
+      border: 1px solid var(--fg);
+      padding: 8px;
+      position: relative;
+    }
+    
+    .panel-title {
+      position: absolute;
+      top: -8px;
+      left: 12px;
+      background: var(--bg);
+      padding: 0 6px;
+      font-size: 9px;
+      color: var(--dim);
+    }
+    
+    /* Boot Log */
+    .boot-log {
+      font-size: 10px;
+    }
+    
+    .boot-log div {
+      display: flex;
+      justify-content: space-between;
+    }
+    
+    .boot-log .pass {
+      color: var(--fg);
+    }
+    
+    .blink {
+      animation: blink 1s step-end infinite;
+    }
+    
+    @keyframes blink {
+      50% { opacity: 0; }
+    }
+    
+    /* Channel Map */
+    .channel-map {
+      font-size: 10px;
+    }
+    
+    .channel-row {
+      display: flex;
+      justify-content: space-between;
+      padding: 2px 0;
+    }
+    
+    .channel-indicator {
+      width: 8px;
+      text-align: center;
+    }
+    
+    /* RTC Display */
+    .rtc {
+      font-size: 24px;
+      text-align: center;
+      letter-spacing: 3px;
+      padding: 10px;
+      border: 1px solid var(--fg);
+      margin-bottom: 8px;
+    }
+    
+    .rtc-label {
+      font-size: 9px;
+      color: var(--dim);
+      text-align: center;
+      margin-bottom: 4px;
+    }
+    
+    /* Serial/Modem */
+    .serial-status {
+      font-size: 10px;
+      margin-bottom: 8px;
+    }
+    
+    .serial-row {
+      display: flex;
+      justify-content: space-between;
+      padding: 2px 0;
+    }
+    
+    /* Gyro */
+    .gyro-display {
+      display: flex;
+      gap: 15px;
+      font-size: 10px;
+      margin-bottom: 8px;
+    }
+    
+    /* Tramsys */
+    .tramsys {
+      font-size: 10px;
+    }
+    
+    .tramsys-row {
+      display: flex;
+      justify-content: space-between;
+      padding: 2px 0;
+      border-bottom: 1px solid rgba(255,255,255,0.1);
+    }
+    
+    /* Weapons Bar */
+    .weapons-bar {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 6px;
+      border: 1px solid var(--fg);
+      margin-top: 8px;
+    }
+    
+    .checkered {
+      width: 20px;
+      height: 20px;
+      background: repeating-linear-gradient(
+        45deg,
+        var(--fg),
+        var(--fg) 2px,
+        transparent 2px,
+        transparent 4px
+      );
+    }
+    
+    .armed-text {
+      font-size: 14px;
+      letter-spacing: 4px;
+    }
+    
+    /* Radar */
+    .radar-container {
+      position: relative;
+      width: 100%;
+      aspect-ratio: 1;
+      max-width: 280px;
+    }
+    
+    #radar {
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+      border: 1px solid var(--fg);
+    }
+    
+    .radar-overlay {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      text-align: center;
+      font-size: 9px;
+      color: var(--dim);
+      pointer-events: none;
+    }
+    
+    /* Target List */
+    .target-list {
+      font-size: 10px;
+      margin-top: 8px;
+    }
+    
+    .target-row {
+      display: flex;
+      justify-content: space-between;
+      padding: 2px 0;
+    }
+    
+    /* ELEC SUBSYS */
+    .elec-schematic {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    
+    .bus-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 10px;
+    }
+    
+    .gen-box {
+      border: 1px solid var(--fg);
+      padding: 4px 8px;
+      font-size: 9px;
+    }
+    
+    .voltage {
+      font-size: 14px;
+    }
+    
+    /* Spectrogram */
+    .spectrogram-container {
+      border: 1px solid var(--fg);
+      height: 120px;
+      position: relative;
+      overflow: hidden;
+    }
+    
+    #spectrogram {
+      width: 100%;
+      height: 100%;
+    }
+    
+    .spec-params {
+      display: flex;
+      gap: 15px;
+      font-size: 9px;
+      margin-top: 4px;
+      color: var(--dim);
+    }
+    
+    /* RWR Contact Log */
+    .rwr-table {
+      font-size: 10px;
+      width: 100%;
+    }
+    
+    .rwr-row {
+      display: flex;
+      padding: 3px 0;
+      border-bottom: 1px solid rgba(255,255,255,0.1);
+    }
+    
+    .rwr-row div:first-child {
+      width: 30px;
+    }
+    
+    .rwr-row div:nth-child(2) {
+      width: 40px;
+    }
+    
+    .priority {
+      color: #ff4444;
+      font-weight: bold;
+    }
+    
+    /* Countermeasures */
+    .chaff-flare {
+      display: flex;
+      gap: 15px;
+      font-size: 10px;
+    }
+    
+    /* Hydraulics */
+    .hydraulic-schematic {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 10px;
+    }
+    
+    .pump-box {
+      border: 1px solid var(--fg);
+      padding: 4px 8px;
+      text-align: center;
+    }
+    
+    .pump-flow {
+      font-size: 14px;
+      display: block;
+    }
+    
+    /* Reservoir Bars */
+    .reservoir-bars {
+      display: flex;
+      gap: 15px;
+      align-items: flex-end;
+      height: 60px;
+    }
+    
+    .res-bar {
+      width: 30px;
+      border: 1px solid var(--fg);
+      position: relative;
+      background: linear-gradient(to top, var(--fg) var(--pct), transparent var(--pct));
+    }
+    
+    .res-label {
+      position: absolute;
+      bottom: -15px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 9px;
+    }
+    
+    .res-pct {
+      position: absolute;
+      top: -15px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 9px;
+    }
+    
+    /* Flight Status */
+    .flight-status {
+      display: flex;
+      gap: 15px;
+      font-size: 10px;
+      flex-wrap: wrap;
+    }
+    
+    .status-item {
+      padding: 4px 8px;
+      border: 1px solid var(--fg);
+    }
+    
+    .status-item.active {
+      border-color: var(--fg);
+      box-shadow: 0 0 10px var(--glow);
+    }
+    
+    /* Environmental */
+    .env-readings {
+      font-size: 10px;
+      margin-top: 8px;
+    }
+    
+    .env-row {
+      display: flex;
+      justify-content: space-between;
+    }
+    
+    /* Footer */
+    .footer {
+      margin-top: 8px;
+      border-top: 1px solid var(--fg);
+      padding-top: 8px;
+      display: flex;
+      justify-content: flex-end;
+      gap: 20px;
+      font-size: 9px;
+      color: var(--dim);
+      writing-mode: vertical-rl;
+      text-orientation: mixed;
+      max-height: 200px;
+      overflow: hidden;
+    }
+    
+    /* Two column layout for left/middle panels */
+    .left-col, .middle-col, .right-col {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    
+    .full-width {
+      grid-column: 1 / -1;
+    }
+    
+    /* Scanline animation for radar */
+    @keyframes sweep {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <!-- Header -->
+    <div class="header">
+      <div class="header-left">
+        <h1>CMX-7500 GEN 2A RADCOMMS IMGU</h1>
+        <div class="govt-prop">U.S. GOVERNMENT PROPERTY T4-S</div>
+      </div>
+      <div class="logo-box">MW</div>
+      <div class="header-right">
+        <div class="tx-rx">
+          <div>TX<br><span id="tx-val">008/064</span></div>
+          <div>RX<br><span id="rx-val">012/128</span></div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Main Grid -->
+    <div class="main-grid">
+      <!-- Left Column -->
+      <div class="left-col">
+        <!-- Boot Log -->
+        <div class="panel">
+          <div class="panel-title">SYSTEM BOOT V2.14A</div>
+          <div class="boot-log" id="boot-log">
+            <div><span>MEMORY TEST 64KB</span><span class="pass">PASS</span></div>
+            <div><span>MPS STANDBY</span><span class="pass">PASS</span></div>
+            <div><span>ECC CHECK</span><span class="pass">PASS</span></div>
+            <div><span>NVRAM BATTERY</span><span class="pass">OK</span></div>
+          </div>
+        </div>
+        
+        <!-- Channel Map -->
+        <div class="panel">
+          <div class="panel-title">CH MAP: AGS-100 MODULE</div>
+          <div class="channel-map" id="channel-map">
+            <div class="channel-row"><span>CCD-W</span><span class="channel-indicator">●</span></div>
+            <div class="channel-row"><span>CCD-N</span><span class="channel-indicator">●</span></div>
+            <div class="channel-row"><span>IR-LW</span><span class="channel-indicator">—</span></div>
+            <div class="channel-row"><span>IR-MW</span><span class="channel-indicator">●</span></div>
+            <div class="channel-row"><span>LLT-V</span><span class="channel-indicator">▲</span></div>
+          </div>
+        </div>
+        
+        <!-- RTC -->
+        <div>
+          <div class="rtc-label">RTC / ZULU</div>
+          <div class="rtc" id="rtc">--:--:--</div>
+        </div>
+        
+        <!-- Serial/Modem -->
+        <div class="panel">
+          <div class="panel-title">SERIAL / MODEM</div>
+          <div class="serial-status">
+            <div class="serial-row"><span>SERIAL A: 9600 QN1</span><span>LINK</span></div>
+            <div class="serial-row"><span>SERIAL B: 1200 QN2</span><span>OFFLINE</span></div>
+            <div class="serial-row"><span>MODEM FSK 300BD</span><span>OK</span></div>
+            <div class="serial-row"><span>CRYPTO KG-84A</span><span>LOADED</span></div>
+          </div>
+        </div>
+        
+        <!-- Gyro -->
+        <div class="panel">
+          <div class="panel-title">GYRO / ALIGNMENT</div>
+          <div class="gyro-display">
+            <div>GYRO X: <span id="gyro-x">ALIGN</span></div>
+            <div>GYRO Y: <span id="gyro-y">ALIGN</span></div>
+            <div>GYRO Z: <span id="gyro-z">ALIGN</span></div>
+          </div>
+        </div>
+        
+        <!-- Weapons Bar -->
+        <div class="weapons-bar">
+          <div class="checkered"></div>
+          <div class="checkered"></div>
+          <div class="armed-text">ARMED</div>
+          <div class="checkered"></div>
+          <div class="checkered"></div>
+        </div>
+      </div>
+      
+      <!-- Middle Column -->
+      <div class="middle-col">
+        <!-- Tramsys -->
+        <div class="panel">
+          <div class="panel-title">TRAMSYS</div>
+          <div class="tramsys">
+            <div class="tramsys-row"><span>185 NM TACAN</span><span id="tacan">22.1 SRCH</span></div>
+            <div class="tramsys-row"><span>UHF 243.0</span><span id="uhf">GRD ACTIVE</span></div>
+            <div class="tramsys-row"><span>WPNS STATUS</span><span id="wpns" class="priority">LOCKED</span></div>
+          </div>
+        </div>
+        
+        <!-- Radar -->
+        <div class="panel">
+          <div class="panel-title">RADAR / TRACKING</div>
+          <div class="radar-container">
+            <canvas id="radar"></canvas>
+            <div class="radar-overlay">RADAR SCOPE</div>
+          </div>
+          <div class="target-list" id="target-list">
+            <div class="target-row"><span>AWACS-4</span><span>000° / 45.2NM</span></div>
+            <div class="target-row"><span>TRK-07</span><span id="trk07">017° / 17.4NM</span></div>
+            <div class="target-row"><span>TRK-11</span><span id="trk11">310° / 5.8NM</span></div>
+            <div class="target-row"><span>TRK-15</span><span id="trk15">085° / 32.1NM</span></div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Right Column -->
+      <div class="right-col">
+        <!-- Electrical -->
+        <div class="panel">
+          <div class="panel-title">ELEC SUBSYS COLLINS 82</div>
+          <div class="elec-schematic">
+            <div class="bus-row">
+              <div class="gen-box">
+                <div class="voltage" id="gen1">28.0V</div>
+                <div>GEN 1</div>
+              </div>
+              <div class="gen-box">
+                <div class="voltage" id="gen2">28.1V</div>
+                <div>GEN 2</div>
+              </div>
+              <span>→</span>
+              <div class="gen-box">
+                <div class="voltage">MAIN BUS</div>
+              </div>
+              <span>→</span>
+              <div class="gen-box">
+                <div class="voltage" id="battery">24.8V</div>
+                <div>STBY OK</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Spectrogram -->
+        <div class="panel">
+          <div class="panel-title">SIGNAL / SPECTROGRAM</div>
+          <div class="spectrogram-container">
+            <canvas id="spectrogram"></canvas>
+          </div>
+          <div class="spec-params">
+            <span>PRF: <span id="prf">1.2K</span></span>
+            <span>AZ SLEW: <span id="az">24</span></span>
+            <span>BW: <span id="bw">100K</span></span>
+            <span>RES: <span id="res">15M</span></span>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Full Width: RWR Contact Log -->
+      <div class="panel full-width">
+        <div class="panel-title">RWR CONTACT LOG / PRIORITY THREAD</div>
+        <div class="rwr-table">
+          <div class="rwr-row">
+            <div class="priority">C4</div>
+            <div>310°</div>
+            <div>8.8GHZ</div>
+            <div>FIRE-CTL</div>
+            <div>TRACK LOCK</div>
+          </div>
+          <div class="rwr-row">
+            <div>A1</div>
+            <div>047°</div>
+            <div>9.4GHZ</div>
+            <div>SA-6</div>
+            <div></div>
+          </div>
+          <div class="rwr-row">
+            <div>B2</div>
+            <div>132°</div>
+            <div>3.2GHZ</div>
+            <div>SEARCH</div>
+            <div></div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Full Width: Bottom Systems -->
+      <div class="panel full-width" style="display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 15px;">
+        <!-- Countermeasures -->
+        <div>
+          <div class="panel-title">COUNTERMEASURES</div>
+          <div class="chaff-flare">
+            <div>CHAFF REM: <span id="chaff">48</span></div>
+            <div>FLARE REM: <span id="flare">32</span></div>
+            <div>IR-JAM: READY</div>
+          </div>
+        </div>
+        
+        <!-- Hydraulics -->
+        <div>
+          <div class="panel-title">HYDRAULICS</div>
+          <div class="hydraulic-schematic">
+            <div class="pump-box">
+              <span class="pump-flow" id="pump1">142</span>
+              <div>PUMP-1</div>
+            </div>
+            <div class="pump-box">
+              <span class="pump-flow" id="pump2">138</span>
+              <div>PUMP-2</div>
+            </div>
+            <div class="pump-box">
+              <span class="pump-flow" id="pump3">000</span>
+              <div>PUMP-3</div>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Reservoirs -->
+        <div>
+          <div class="panel-title">RESERVOIR LEVELS</div>
+          <div class="reservoir-bars">
+            <div class="res-bar" style="--pct: 92%">
+              <span class="res-pct">92%</span>
+              <span class="res-label">RES A</span>
+            </div>
+            <div class="res-bar" style="--pct: 89%">
+              <span class="res-pct">89%</span>
+              <span class="res-label">RES B</span>
+            </div>
+            <div class="res-bar" style="--pct: 67%">
+              <span class="res-pct">67%</span>
+              <span class="res-label">RES UTL</span>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Flight Status -->
+        <div>
+          <div class="panel-title">FLIGHT STATUS</div>
+          <div class="flight-status">
+            <div class="status-item active">[FLT-CTL] ACTIVE</div>
+            <div class="status-item">[GEAR] DOWN</div>
+            <div class="status-item">[FLAPS] UP-20°</div>
+            <div class="status-item">[BRAKES] RELEASED</div>
+          </div>
+          <div class="env-readings">
+            <div class="env-row"><span>TEMP:</span><span id="temp">187°F</span></div>
+            <div class="env-row"><span>ACCUM PRESS:</span><span id="pressure">3000PSI</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Footer -->
+    <div class="footer">
+      <span>U.S. Graphics Company</span>
+      <span>TX-24™ Houston Mono</span>
+      <span>CS-100 / 12</span>
+      <span>© U.S. Graphics, LLC.</span>
+    </div>
+  </div>
+  
+  <script>
+    // RTC Clock
+    function updateRTC() {
+      const now = new Date();
+      const zulu = now.toISOString().replace('T', ' ').substring(0, 19) + 'Z';
+      document.getElementById('rtc').textContent = zulu.split(' ')[1];
+    }
+    setInterval(updateRTC, 1000);
+    updateRTC();
+    
+    // Radar
+    const radarCanvas = document.getElementById('radar');
+    const radarCtx = radarCanvas.getContext('2d');
+    const radarRadius = 140;
+    let radarAngle = 0;
+    
+    function resizeRadar() {
+      const container = radarCanvas.parentElement;
+      const size = Math.min(container.offsetWidth, 280);
+      radarCanvas.width = size;
+      radarCanvas.height = size;
+    }
+    resizeRadar();
+    window.addEventListener('resize', resizeRadar);
+    
+    // Targets
+    const targets = [
+      { angle: 0, dist: 45.2, name: 'AWACS-4' },
+      { angle: 17, dist: 17.4, name: 'TRK-07' },
+      { angle: 310, dist: 5.8, name: 'TRK-11' },
+      { angle: 85, dist: 32.1, name: 'TRK-15' }
+    ];
+    
+    function drawRadar() {
+      const w = radarCanvas.width;
+      const h = radarCanvas.height;
+      const cx = w / 2;
+      const cy = h / 2;
+      const r = Math.min(cx, cy) - 5;
+      
+      // Clear
+      radarCtx.fillStyle = '#0a0a0a';
+      radarCtx.fillRect(0, 0, w, h);
+      
+      // Circles
+      radarCtx.strokeStyle = 'rgba(255,255,255,0.3)';
+      radarCtx.lineWidth = 1;
+      for (let i = 1; i <= 4; i++) {
+        radarCtx.beginPath();
+        radarCtx.arc(cx, cy, r * i / 4);
+        radarCtx.stroke();
+      }
+      
+      // Cross lines
+      radarCtx.beginPath();
+      radarCtx.moveTo(cx, cy - r);
+      radarCtx.lineTo(cx, cy + r);
+      radarCtx.moveTo(cx - r, cy);
+      radarCtx.lineTo(cx + r, cy);
+      radarCtx.stroke();
+      
+      // Sweep
+      const sweepAngle = radarAngle * Math.PI / 180;
+      const sweepGradient = radarCtx.createLinearGradient(cx, cy, 
+        cx + r * Math.cos(sweepAngle), cy + r * Math.sin(sweepAngle));
+      sweepGradient.addColorStop(0, 'rgba(255,255,255,0)');
+      sweepGradient.addColorStop(1, 'rgba(255,255,255,0.5)');
+      
+      radarCtx.beginPath();
+      radarCtx.moveTo(cx, cy);
+      radarCtx.arc(cx, cy, r, sweepAngle - 0.5, sweepAngle);
+      radarCtx.closePath();
+      radarCtx.fillStyle = sweepGradient;
+      radarCtx.fill();
+      
+      // Targets
+      targets.forEach(t => {
+        const tAngle = (t.angle - 90) * Math.PI / 180;
+        const dist = (t.dist / 50) * r;
+        if (dist <= r) {
+          const tx = cx + dist * Math.cos(tAngle);
+          const ty = cy + dist * Math.sin(tAngle);
+          
+          // Check if in sweep
+          let diff = t.angle - radarAngle;
+          while (diff < 0) diff += 360;
+          while (diff > 180) diff -= 360;
+          
+          const alpha = Math.abs(diff) < 30 ? 1 : 0.4;
+          radarCtx.fillStyle = `rgba(255,255,255,${alpha})`;
+          radarCtx.beginPath();
+          radarCtx.arc(tx, ty, 4, 0, Math.PI * 2);
+          radarCtx.fill();
+          
+          // Name
+          radarCtx.font = '9px Courier New';
+          radarCtx.fillText(t.name, tx + 8, ty + 3);
+        }
+      });
+      
+      // Center dot
+      radarCtx.fillStyle = '#fff';
+      radarCtx.beginPath();
+      radarCtx.arc(cx, cy, 3, 0, Math.PI * 2);
+      radarCtx.fill();
+      
+      radarAngle = (radarAngle + 2) % 360;
+      requestAnimationFrame(drawRadar);
+    }
+    drawRadar();
+    
+    // Spectrogram
+    const specCanvas = document.getElementById('spectrogram');
+    const specCtx = specCanvas.getContext('2d');
+    
+    function resizeSpec() {
+      const container = specCanvas.parentElement;
+      specCanvas.width = container.offsetWidth;
+      specCanvas.height = container.offsetHeight;
+    }
+    resizeSpec();
+    window.addEventListener('resize', resizeSpec);
+    
+    let specData = [];
+    const specHeight = 120;
+    const specLineCount = 200;
+    
+    function drawSpectrogram() {
+      const w = specCanvas.width;
+      const h = specCanvas.height;
+      
+      // Shift existing data
+      if (specData.length > 0) {
+        specData.shift();
+      }
+      
+      // Generate new line
+      const line = [];
+      for (let x = 0; x < w; x++) {
+        // Random noise with some peaks
+        let v = Math.random() * 0.3;
+        if (Math.random() < 0.05) {
+          v = 0.7 + Math.random() * 0.3;
+        }
+        // Occasional sweep
+        const sweepPos = (Date.now() / 50) % w;
+        if (Math.abs(x - sweepPos) < 20) {
+          v = Math.max(v, 0.5);
+        }
+        line.push(v);
+      }
+      specData.push(line);
+      
+      // Draw
+      specCtx.fillStyle = '#0a0a0a';
+      specCtx.fillRect(0, 0, w, h);
+      
+      specData.forEach((l, i) => {
+        l.forEach((v, x) => {
+          const intensity = Math.floor(v * 255);
+          specCtx.fillStyle = `rgb(${intensity},${intensity},${intensity})`;
+          specCtx.fillRect(x, h - specData.length + i, 1, 1);
+        });
+      });
+      
+      requestAnimationFrame(drawSpectrogram);
+    }
+    drawSpectrogram();
+    
+    // Live data updates
+    function updateLiveData() {
+      // Fluctuate voltages
+      const gen1 = (28.0 + (Math.random() - 0.5) * 0.4).toFixed(1);
+      const gen2 = (28.1 + (Math.random() - 0.5) * 0.4).toFixed(1);
+      const battery = (24.8 + (Math.random() - 0.5) * 0.2).toFixed(1);
+      document.getElementById('gen1').textContent = gen1 + 'V';
+      document.getElementById('gen2').textContent = gen2 + 'V';
+      document.getElementById('battery').textContent = battery + 'V';
+      
+      // Fluctuate pumps
+      document.getElementById('pump1').textContent = Math.floor(140 + (Math.random() - 0.5) * 10);
+      document.getElementById('pump2').textContent = Math.floor(138 + (Math.random() - 0.5) * 10);
+      
+      // Fluctuate temp
+      const temp = Math.floor(187 + (Math.random() - 0.5) * 6);
+      document.getElementById('temp').textContent = temp + '°F';
+      
+      // Update targets
+      targets.forEach((t, i) => {
+        t.angle = (t.angle + (Math.random() - 0.5) * 3) % 360;
+        t.dist = Math.max(1, t.dist + (Math.random() - 0.5) * 0.5);
+      });
+      
+      // Update TRK values in list
+      document.getElementById('trk07').textContent = `${Math.round(targets[1].angle).toString().padStart(3, '0')}° / ${targets[1].dist.toFixed(1)}NM`;
+      document.getElementById('trk11').textContent = `${Math.round(targets[2].angle).toString().padStart(3, '0')}° / ${targets[2].dist.toFixed(1)}NM`;
+      document.getElementById('trk15').textContent = `${Math.round(targets[3].angle).toString().padStart(3, '0')}° / ${targets[3].dist.toFixed(1)}NM`;
+    }
+    setInterval(updateLiveData, 500);
+    
+    // Occasional alert blink
+    setInterval(() => {
+      const wpns = document.getElementById('wpns');
+      if (Math.random() < 0.1) {
+        wpns.style.color = '#ff4444';
+        setTimeout(() => wpns.style.color = '', 200);
+      }
+    }, 1000);
+  </script>
+</body>
+</html>
