@@ -934,7 +934,7 @@
     
     function resizeRadar() {
       const container = radarCanvas.parentElement;
-      const size = Math.min(container.offsetWidth, 280);
+      const size = Math.min(container.offsetWidth || 280, 280);
       radarCanvas.width = size;
       radarCanvas.height = size;
     }
@@ -952,6 +952,10 @@
     function drawRadar() {
       const w = radarCanvas.width;
       const h = radarCanvas.height;
+      if (w === 0 || h === 0) {
+        requestAnimationFrame(drawRadar);
+        return;
+      }
       const cx = w / 2;
       const cy = h / 2;
       const r = Math.min(cx, cy) - 5;
@@ -1033,8 +1037,8 @@
     
     function resizeSpec() {
       const container = specCanvas.parentElement;
-      specCanvas.width = container.offsetWidth;
-      specCanvas.height = container.offsetHeight;
+      specCanvas.width = container.offsetWidth || 300;
+      specCanvas.height = container.offsetHeight || 120;
     }
     resizeSpec();
     window.addEventListener('resize', resizeSpec);
@@ -1046,6 +1050,10 @@
     function drawSpectrogram() {
       const w = specCanvas.width;
       const h = specCanvas.height;
+      if (w === 0 || h === 0) {
+        requestAnimationFrame(drawSpectrogram);
+        return;
+      }
       
       // Shift existing data
       if (specData.length > 0) {
